@@ -1,0 +1,21 @@
+Generic single-database configuration for Flask-Migrate.
+
+To initialize the migrations directory:
+```
+flask db init
+```
+
+To create a new migration:
+```
+flask db migrate -m "Description of changes"
+```
+
+To apply migrations:
+```
+flask db upgrade
+```
+
+To downgrade:
+```
+flask db downgrade
+```

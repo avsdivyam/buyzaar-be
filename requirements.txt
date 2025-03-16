@@ -1,0 +1,33 @@
+# Flask and extensions
+flask==2.3.3
+flask-sqlalchemy==3.1.1
+flask-migrate==4.0.5
+flask-cors==4.0.0
+
+# Database
+psycopg2-binary==2.9.9
+alembic==1.12.1
+
+# Authentication
+python-keycloak==3.3.0
+pyjwt==2.8.0
+
+# Validation and serialization
+marshmallow==3.20.1
+
+# Google Drive integration
+google-api-python-client==2.108.0
+google-auth-httplib2==0.1.1
+google-auth-oauthlib==1.1.0
+
+# Environment variables
+python-dotenv==1.0.0
+
+# Production server
+gunicorn==21.2.0
+
+# Development tools
+pytest==7.4.3
+pytest-flask==1.3.0
+black==23.10.1
+flake8==6.1.0
