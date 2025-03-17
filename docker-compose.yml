@@ -5,11 +5,20 @@ services:
     build: .
     ports:
       - "5000:5000"
-    env_file:
-      - .env
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_CONFIG=development
+      - FLASK_DEBUG=1
+      - DATABASE_URL=postgresql://dmtavs:Dmt@1212@db:5432/buyzaar
+      - DEV_DATABASE_URL=postgresql://dmtavs:Dmt@1212@db:5432/buyzaar
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - LOG_LEVEL=DEBUG
+      - KEYCLOAK_SERVER_URL=http://keycloak:8080/
+      - KEYCLOAK_REALM=buyzaar
+      - KEYCLOAK_CLIENT_ID=buyzaar-client
+      - KEYCLOAK_CLIENT_SECRET=your-client-secret
     depends_on:
       - db
-      - keycloak
     volumes:
       - ./app:/app/app
       - ./migrations:/app/migrations
@@ -26,39 +35,19 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data/
     environment:
-      - POSTGRES_USER=${POSTGRES_USER:-postgres}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-      - POSTGRES_DB=${POSTGRES_DB:-app}
+      - POSTGRES_USER=dmtavs
+      - POSTGRES_PASSWORD=Dmt@1212
+      - POSTGRES_DB=buyzaar
     ports:
       - "5432:5432"
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      test: ["CMD-SHELL", "pg_isready -U dmtavs -d dmtavs -d buyzaar"]
       interval: 10s
       timeout: 5s
       retries: 5
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:22.0.1
-    environment:
-      - KEYCLOAK_ADMIN=${KEYCLOAK_ADMIN:-admin}
-      - KEYCLOAK_ADMIN_PASSWORD=${KEYCLOAK_ADMIN_PASSWORD:-admin}
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://db:5432/${POSTGRES_DB:-app}
-      - KC_DB_USERNAME=${POSTGRES_USER:-postgres}
-      - KC_DB_PASSWORD=${POSTGRES_PASSWORD:-postgres}
-    command: start-dev
-    ports:
-      - "8080:8080"
-    depends_on:
-      - db
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health/ready"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
+
 
 volumes:
   postgres_data:

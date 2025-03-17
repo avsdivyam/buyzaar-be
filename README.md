@@ -1,4 +1,91 @@
-# E-Commerce Backend
+# BuyZaar Backend
+
+This is the backend API for the BuyZaar e-commerce application.
+
+## Setup
+
+### Prerequisites
+
+- Python 3.8+
+- PostgreSQL 12+
+- Virtual environment (recommended)
+
+### Environment Setup
+
+1. Create a virtual environment:
+   ```bash
+   python -m venv venv
+   ```
+
+2. Activate the virtual environment:
+   - On Windows:
+     ```bash
+     venv\Scripts\activate
+     ```
+   - On macOS/Linux:
+     ```bash
+     source venv/bin/activate
+     ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Create a `.env` file based on `.env.example` and update with your configuration:
+   ```bash
+   cp .env.example .env
+   ```
+
+### Database Setup
+
+1. Create a PostgreSQL database:
+   ```sql
+   CREATE DATABASE buyzaar;
+   CREATE USER dmtavs WITH PASSWORD 'Dmt@1212';
+   GRANT ALL PRIVILEGES ON DATABASE buyzaar TO dmtavs;
+   ```
+
+2. Initialize the database:
+   ```bash
+   python -m scripts.init_db
+   ```
+
+3. Run database migrations:
+   ```bash
+   flask db upgrade
+   ```
+
+## Running the Application
+
+1. Start the development server:
+   ```bash
+   flask run
+   ```
+
+2. The API will be available at `http://localhost:5000`
+
+## API Documentation
+
+API documentation is available at `/api/docs` when the server is running.
+
+## Testing
+
+Run tests with:
+```bash
+pytest
+```
+
+## Deployment
+
+For production deployment, set the following environment variables:
+- `FLASK_CONFIG=production`
+- `DATABASE_URL=postgresql://username:password@host:port/dbname`
+- `SECRET_KEY=your-secure-secret-key`
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.# E-Commerce Backend
 
 A modern, scalable e-commerce backend built with Flask, SQLAlchemy, and Keycloak.
 

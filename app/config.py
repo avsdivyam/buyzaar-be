@@ -54,18 +54,40 @@ class Config:
 
 class DevelopmentConfig(Config):
     """Development configuration."""
-    
+
     DEBUG = True
+
+    # Use the DEV_DATABASE_URL from environment variables
+    # If not set, fall back to a default SQLite database
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///dev-app.db'
-    
+
+    # Database connection settings
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,  # Detect and reconnect to database if connection is lost
+        'pool_recycle': 300,    # Recycle connections after 5 minutes
+        'pool_size': 10,        # Maximum number of connections to keep in the pool
+        'max_overflow': 20      # Maximum number of connections to create above pool_size
+    }
+
     @staticmethod
     def init_app(app):
         Config.init_app(app)
-        
+
         # Log to console
         import logging
         app.logger.setLevel(logging.DEBUG)
+
+        # Log database connection info (but not credentials)
+        db_url = os.environ.get('DEV_DATABASE_URL', '')
+        if db_url:
+            # Extract just the database type and name for logging (not credentials)
+            parts = db_url.split('@')
+            if len(parts) > 1:
+                db_info = parts[1]
+            else:
+                db_info = parts[0].split('://')[0] if '://' in parts[0] else parts[0]
+            app.logger.info(f"Using database: {db_info}")
 
 
 class TestingConfig(Config):
@@ -81,19 +103,53 @@ class TestingConfig(Config):
 
 class ProductionConfig(Config):
     """Production configuration."""
-    
+
+    # Use the DATABASE_URL from environment variables
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    
+
+    # Database connection settings for production
+    SQLALCHEMY_ENGINE_OPTIONS = {
+        'pool_pre_ping': True,      # Detect and reconnect to database if connection is lost
+        'pool_recycle': 300,        # Recycle connections after 5 minutes
+        'pool_size': 20,            # Maximum number of connections to keep in the pool
+        'max_overflow': 40,         # Maximum number of connections to create above pool_size
+        'pool_timeout': 30,         # Timeout for getting a connection from the pool
+        'connect_args': {
+            'connect_timeout': 10   # Connection timeout in seconds
+        }
+    }
+
+    # Additional security settings for production
+    SESSION_COOKIE_SECURE = True
+    SESSION_COOKIE_HTTPONLY = True
+    REMEMBER_COOKIE_SECURE = True
+    REMEMBER_COOKIE_HTTPONLY = True
+
     @staticmethod
     def init_app(app):
         Config.init_app(app)
-        
+
         # Log to syslog in production
         import logging
         from logging.handlers import SysLogHandler
         syslog_handler = SysLogHandler()
         syslog_handler.setLevel(logging.WARNING)
         app.logger.addHandler(syslog_handler)
+
+        # Validate that DATABASE_URL is set
+        if not os.environ.get('DATABASE_URL'):
+            app.logger.error("DATABASE_URL environment variable is not set. Application may not function correctly.")
+
+        # Log database connection info (but not credentials)
+        db_url = os.environ.get('DATABASE_URL', '')
+        if db_url:
+            # Extract just the database type and name for logging (not credentials)
+            parts = db_url.split('@')
+            if len(parts) > 1:
+                db_info = parts[1]
+            else:
+                db_info = parts[0].split('://')[0] if '://' in parts[0] else parts[0]
+            app.logger.info(f"Using database: {db_info}")
 
 
 # Configuration dictionary
